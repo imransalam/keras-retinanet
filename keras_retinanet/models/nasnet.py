@@ -1,4 +1,4 @@
-"""
+"""mode
 Copyright 2018 vidosits (https://github.com/vidosits/)
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,22 +43,21 @@ class NasNetBackbone(Backbone):
             https://github.com/keras-team/keras/blob/master/keras/applications/nasnet.py
         """
         origin    = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.8/'
-        file_name = '{}_weights_tf_dim_ordering_tf_kernels_notop.h5'
+        file_name = 'NASNet-{}-no-top.h5'
 
         # load weights
         if keras.backend.image_data_format() == 'channels_first':
             raise ValueError('Weights for "channels_first" format are not available.')
 
-        weights_url = origin + file_name.format(self.backbone)
+        weights_url = origin + file_name.format(self.backbone.split('_')[-1])
         return get_file(file_name.format(self.backbone), weights_url, cache_subdir='models')
 
     def validate(self):
         """ Checks whether the backbone string is correct.
         """
-        backbone = self.backbone.split('_')[0]
 
-        if backbone not in allowed_backbones:
-            raise ValueError('Backbone (\'{}\') not in allowed backbones ({}).'.format(backbone, allowed_backbones.keys()))
+        if self.backbone not in allowed_backbones:
+            raise ValueError('Backbone (\'{}\') not in allowed backbones ({}).'.format(self.backbone, allowed_backbones.keys()))
 
     def preprocess_image(self, inputs):
         """ Takes as input an image and prepares it for being passed through the network.
@@ -83,9 +82,8 @@ def nasnet_retinanet(num_classes, backbone='nasnet_large', inputs=None, modifier
     creator = allowed_backbones[backbone]
     model = creator(input_tensor=inputs, include_top=False, pooling=None, weights=None)
 
-    
-    layer_names = ['concatenate_1', 'concatenate_2', 'concatenate_3', 'concatenate_4']
-    layer_outputs = [backbone.get_layer(name).output for name in layer_names]
+    layer_names = ['normal_concat_5', 'normal_concat_12', 'normal_concat_18']
+    layer_outputs = [model.get_layer(name).output for name in layer_names]
 
     # create the nasnet backbone
     model = keras.models.Model(inputs=inputs, outputs=layer_outputs, name=model.name)
