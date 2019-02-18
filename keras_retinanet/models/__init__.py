@@ -57,9 +57,10 @@ def backbone(backbone_name):
         from .vgg import VGGBackbone as b
     elif 'densenet' in backbone_name:
         from .densenet import DenseNetBackbone as b
+    elif 'nasnet' in backbone_name:
+        from .nasnet import NasNetBackbone as b
     else:
         raise NotImplementedError('Backbone class for  \'{}\' not implemented.'.format(backbone))
-
     return b(backbone_name)
 
 
